@@ -1,7 +1,7 @@
 set c item /c1*c3/
     p produto / p1*p3 /
-    t perÌodo / t1*t5 /
-    i nÛs / i1*i7 /
+    t per√≠odo / t1*t5 /
+    i n√≥s / i1*i7 /
     r rotas / r1*r5/
 ;
 
@@ -51,19 +51,19 @@ l(c) (lc) comprimento do item c
 parameter h(c) (hc) custo de estocagem do item c;
 h(c) = 0.001*w(c)*l(c);
 
-parameter f(c) (fc) custo do setup de produÁ„o do item c;
+parameter f(c) (fc) custo do setup de produ√ß√£o do item c;
 f(c) = 1000*h(c);
 
 parameter ro(c) (roc) tempo de processamento do item c;
 ro(c) = w(c)*l(c)/2500;
 
-parameter K(t) (Kt) capacidade de produÁ„o no perÌodo t;
+parameter K(t) (Kt) capacidade de produ√ß√£o no per√≠odo t;
 K(t) = (sum(c, ro(c)*sum(p, sum(ii, d(p,ii)*n(c,p)))))*3.5/card(t) ;
 
 parameter Io(c) (Ioc) estoque inicial de c;
 Io(c) =  sum(p, sum(ii, d(p,ii)*n(c,p)))/card(t);
 
-parameter X(i) (Xi) coordenada X do nÛ i
+parameter X(i) (Xi) coordenada X do n√≥ i
 /i1 0
  i2 100
  i3 300
@@ -73,7 +73,7 @@ parameter X(i) (Xi) coordenada X do nÛ i
  i7 0   /
 ;
 
-parameter Y(i) (Yi) coordenada Y do nÛ i
+parameter Y(i) (Yi) coordenada Y do n√≥ i
 /i1 0
  i2 200
  i3 300
@@ -83,7 +83,7 @@ parameter Y(i) (Yi) coordenada Y do nÛ i
  i7 0
 /;
 
-parameter X_(j) coordenada X do nÛ i
+parameter X_(j) coordenada X do n√≥ i
 /i1 0
  i2 100
  i3 300
@@ -93,7 +93,7 @@ parameter X_(j) coordenada X do nÛ i
  i7 0   /
 ;
 
-parameter Y_(j) coordenada Y do nÛ i
+parameter Y_(j) coordenada Y do n√≥ i
 /i1 0
  i2 200
  i3 300
@@ -103,25 +103,25 @@ parameter Y_(j) coordenada Y do nÛ i
  i7 0
 /;
 
-parameter tal(i,j) (talij) tempo de viagem de nÛ i para o nÛ j;
+parameter tal(i,j) (talij) tempo de viagem de n√≥ i para o n√≥ j;
 tal(i,j) = (60/100)*(((X(i)-X_(j))**2 + (Y(i)-Y_(j))**2)**(1/2));
 
-parameter ct(i,j) (cij) custo de viagem de nÛ i para o nÛ j;
+parameter ct(i,j) (cij) custo de viagem de n√≥ i para o n√≥ j;
 ct(i,j) = (((X(i)-X_(j))**2 + (Y(i)-Y_(j))**2)**(1/2));
 
-parameter fi(p) (fip) peso unit·rio do produto p;
+parameter fi(p) (fip) peso unit√°rio do produto p;
 fi(p) = 0.001*(sum(c, w(c)*l(c)*n(c,p)));
 
-scalar teta capacidade do veÌculo;
+scalar teta capacidade do ve√≠culo;
 teta = sum(p, sum(ii, d(p,ii)*fi(p)));
 
-*janela de tempo do nÛ i1 atÈ i6 no perÌodo t
+*janela de tempo do n√≥ i1 at√© i6 no per√≠odo t
 parameter delta_inicial(t);
 delta_inicial(t) = 480 + 1440*(ord(t) - 1);
 parameter delta_final(t);
 delta_final(t) = 1080 + 1440*(ord(t) - 1) ;
 
-*janela de tempo do nÛ i7(depÛsito final) no perÌodo t
+*janela de tempo do n√≥ i7(dep√≥sito final) no per√≠odo t
 parameter delta_depot_inicial(t);
 delta_depot_inicial(t) = 1440*(ord(t) - 1);
 parameter delta_depot_final(t);
@@ -131,32 +131,32 @@ scalar lambda Tempo de descarregar ou carregar por unidade de peso  / 0.02/;
 
 scalar delta data de vencimento do cliente i / [1080 + 1440*(card(t) - 1)]/ ;
 
-scalar Rotas N˙mero m·ximo de rotas no plano horizontal /[card(i) - 2]/;
+scalar Rotas N√∫mero m√°ximo de rotas no plano horizontal /[card(i) - 2]/;
 
-parameter s(ii) tempo de serviÁo do cliente i;
+parameter s(ii) tempo de servi√ßo do cliente i;
 s(ii) = lambda*sum(p, fi(p)*d(p,ii));
 
-parameter M_inicial(i,j) n˙mero muito grande inicial;
+parameter M_inicial(i,j) n√∫mero muito grande inicial;
 M_inicial(i,j) $(ord(i) eq 1 and ord(j) gt 1 and ord(j) lt card(j)) = (1080 + 1440*(card(t) - 1)) + min(lambda*teta, sum(ii $(ord(ii) gt 1 and ord(ii) lt card(ii)), s(ii))) + tal(i,j) ;
 
-parameter M(i,j) n˙mero muito grande;
+parameter M(i,j) n√∫mero muito grande;
 M(i,j) $(ord(i) gt 1 and ord(i) lt card(i) and ord(j) gt 1) = delta + s(i) + tal(i,j) ;
 
-parameter Mc(c,t)  limite superior da quantidade de produÁ„o;
+parameter Mc(c,t)  limite superior da quantidade de produ√ß√£o;
 Mc(c,t) = min(K(t)/ro(c),sum(ii, sum(p, n(c,p)*d(p,ii))));
 
 free variable z ;
 
-*Lot-sizing vari·veis    (MUDAR O NOME DAS VARI¡VEIS)
-binary variable yy(c,t) igual a 1 se tive produÁ„o do item c no perÌodo t caso contr·rio 0;
-positive variable xx(c,t) quantidade de produÁ„o do item c no perÌodo t;
-positive variable Ic(c,t) invent·rio do item c no final do perÌodo t ;
+*Lot-sizing vari√°veis    (MUDAR O NOME DAS VARI√ÅVEIS)
+binary variable yy(c,t) igual a 1 se tive produ√ß√£o do item c no per√≠odo t caso contr√°rio 0;
+positive variable xx(c,t) quantidade de produ√ß√£o do item c no per√≠odo t;
+positive variable Ic(c,t) invent√°rio do item c no final do per√≠odo t ;
 
-*Routing vari·veis
-binary variable wo(i,j,r) igual a 1 se a rota r viajar diretamente do nÛ i para o nÛ j caso contr·rio 0  ;
-positive variable Qo(p,r,t) quantidade do produto p enviado na rota r no perÌodo t;
-binary variable psi(i,r,t) igual a 1 se o nÛ i È visitado pela rota r no perÌodo t caso contr·rio 0;
-positive variable mi(i,r) tempo inicial em que o nÛ i È abastecido pela rota r;
+*Routing vari√°veis
+binary variable wo(i,j,r) igual a 1 se a rota r viajar diretamente do n√≥ i para o n√≥ j caso contr√°rio 0  ;
+positive variable Qo(p,r,t) quantidade do produto p enviado na rota r no per√≠odo t;
+binary variable psi(i,r,t) igual a 1 se o n√≥ i √© visitado pela rota r no per√≠odo t caso contr√°rio 0;
+positive variable mi(i,r) tempo inicial em que o n√≥ i √© abastecido pela rota r;
 
 equations
 fo
@@ -178,7 +178,7 @@ Capacidade_Producao(t).. sum(c, ro(c)*xx(c,t)) =l= K(t);
 Producao_item(c,t).. xx(c,t) =l= Mc(c,t)*yy(c,t);
 Partindo_Deposito(i,j,r).. wo(i,j,r) $ (ord(i)eq 1)  =e= 1;
 Chegando_Deposito(i,j,r).. wo (i,j,r) $ (ord(j) eq card(j)) =e= 1;
-Conservacao_Fluxo(i,j,r).. w(i,j,r) =e= sum(w(j,i,r) $ (ord(j)<> ord(i) and ord(j) gt 1 and ord(j)< card(j)));
+Conservacao_Fluxo(i,j,r).. wo(i,j,r) =e= sum(wo(j,i,r) $ (ord(j)<> ord(i) and ord(j) gt 1 and ord(j)< card(j)));
 
 
 
